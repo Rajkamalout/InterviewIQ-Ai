@@ -26,33 +26,42 @@ function Step1SetUp({ onStart }) {
     const [analysisDone, setAnalysisDone] = useState(false);
     const [analyzing, setAnalyzing] = useState(false);
 
-
     const handleUploadResume = async () => {
-        if (!resumeFile || analyzing) return;
-        setAnalyzing(true)
+  if (!resumeFile || analyzing) return;
 
-        const formdata = new FormData()
-        formdata.append("resume", resumeFile)
+  setAnalyzing(true);
 
-        try {
-            const result = await axios.post(ServerUrl + "/api/interview/resume", formdata, { withCredentials: true })
+  const formdata = new FormData();
+  formdata.append("resume", resumeFile);
 
-            console.log(result.data)
+  try {
+    const result = await axios.post(
+      `${ServerUrl}/api/interview/resume`,
+      formdata,
+      {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
 
-            setRole(result.data.role || "");
-            setExperience(result.data.experience || "");
-            setProjects(result.data.projects || []);
-            setSkills(result.data.skills || []);
-            setResumeText(result.data.resumeText || "");
-            setAnalysisDone(true);
+    console.log(result.data);
 
-            setAnalyzing(false);
+    setRole(result.data.role || "");
+    setExperience(result.data.experience || "");
+    setProjects(result.data.projects || []);
+    setSkills(result.data.skills || []);
+    setResumeText(result.data.resumeText || "");
+    setAnalysisDone(true);
 
-        } catch (error) {
-            console.log(error)
-            setAnalyzing(false);
-        }
-    }
+  } catch (error) {
+    console.log(error.response?.data || error.message);
+  } finally {
+    setAnalyzing(false);
+  }
+};
+    
 
     const handleStart = async () => {
         setLoading(true)
